@@ -1,0 +1,69 @@
+from collections import deque
+
+class DGIM:
+    def __init__(self, window_size):
+        self.window_size = window_size
+        self.buckets = deque()
+        self.current_time = 0
+    
+    def _expire_old_buckets(self):
+        while self.buckets and self.buckets[0][0] <= self.current_time - self.window_size:
+            expired = self.buckets.popleft()
+            print(f"Expired bucket {expired} as it's outside the window")
+
+    def _compress_buckets(self):
+        i = len(self.buckets) - 1
+        while i >= 2:
+            # Check last 3 buckets sizes
+            if (self.buckets[i][1] == self.buckets[i-1][1] == self.buckets[i-2][1]):
+                # Merge the two oldest buckets (i-2 and i-1)
+                merged_bucket = (self.buckets[i-1][0], self.buckets[i-1][1] * 2)
+                print(f"Merging buckets {self.buckets[i-2]} and {self.buckets[i-1]} into {merged_bucket}")
+                # Remove the two oldest buckets
+                del self.buckets[i-2]
+                del self.buckets[i-2]
+                # Insert merged bucket
+                self.buckets.insert(i-2, merged_bucket)
+                # Restart checking from end
+                i = len(self.buckets)
+            i -= 1
+    
+    def add_bit(self, bit):
+        self.current_time += 1
+        print(f"\nProcessing bit #{self.current_time}: {bit}")
+        if bit == 1:
+            # Add new bucket size 1
+            new_bucket = (self.current_time, 1)
+            self.buckets.append(new_bucket)
+            print(f"Created new bucket {new_bucket}")
+            self._compress_buckets()
+        self._expire_old_buckets()
+        self.print_buckets()
+
+    def query(self, k=None):
+        if k is None:
+            k = self.window_size
+        threshold_time = self.current_time - k
+        count = 0
+        for timestamp, size in reversed(self.buckets):
+            if timestamp > threshold_time:
+                count += size
+            else:
+                count += size // 2
+                break
+        return count
+
+    def print_buckets(self):
+        print("Current buckets (timestamp, size):")
+        for b in self.buckets:
+            print(f"  {b}")
+
+# Example usage
+stream = [1,0,1,1,0,1,0,1,0,1]
+window_size = 8
+dgim = DGIM(window_size)
+
+for bit in stream:
+    dgim.add_bit(bit)
+    approx_count = dgim.query()
+    print(f"Approximate count of 1s in last {window_size} bits: {approx_count}")

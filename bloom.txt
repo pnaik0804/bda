@@ -1,0 +1,34 @@
+import hashlib
+
+class Bloom:
+    def _init_(self, size=20, hashes=3):
+        self.size = size
+        self.hashes = hashes
+        self.bits = [0] * size
+
+    def _hashes(self, item):
+        for i in range(self.hashes):
+            h = int(hashlib.md5((item + str(i)).encode()).hexdigest(), 16)
+            yield h % self.size
+
+    def add(self, item):
+        positions = []
+        for pos in self._hashes(item):
+            self.bits[pos] = 1
+            positions.append(pos)
+        print(f"Added {item} → positions {positions}")
+
+    def check(self, item):
+        res = all(self.bits[p] for p in self._hashes(item))
+        print(f"{item} → {'possibly in set' if res else 'definitely not in set'}")
+        return res
+
+# ---- Demo ----
+bf = Bloom()
+# Add elements
+for word in ["cat", "dog", "rat"]:
+    bf.add(word)
+
+# Check elements
+for word in ["cat", "bat", "rat", "cow"]:
+    bf.check(word)

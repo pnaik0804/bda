@@ -1,0 +1,69 @@
+#Simple linear regression
+
+x <- c(1,2,3,4,5)
+y <- c(2,4,5,4,5)
+b <- sum((x - mean(x)) * (y - mean(y))) / sum((x - mean(x))^2)
+a <- mean(y) - b * mean(x)
+cat("Linear Regression: y =", round(a,2), "+", round(b,2), "* x\n")
+plot(x, y, pch = 19, col = "blue",
+     main = "Simple Linear Regression",
+     xlab = "X", ylab = "Y")
+abline(a, b, col = "red", lwd = 2)
+
+
+
+
+
+
+#Multiple linear regression
+
+x1 <- c(1,2,3,4,5)
+x2 <- c(2,1,4,3,5)
+y  <- c(2,3,5,4,5)
+# Create matrix X (with intercept column)
+X <- cbind(1, x1, x2)
+# Calculate regression coefficients using Normal Equation
+b <- solve(t(X) %*% X) %*% t(X) %*% y
+cat("Multiple Regression Coefficients:\n")
+print(b)
+# Predicted Y values
+y_pred <- X %*% b
+# Plot predicted vs actual values
+plot(y_pred, y, pch = 19, col = "blue",
+     main = "Multiple Linear Regression",
+     xlab = "Predicted Y", ylab = "Actual Y")
+# Add 45° reference line
+abline(0, 1, col = "red", lwd = 2)
+
+
+
+
+
+
+
+#LOGISTIC REGRESSION
+
+# Sigmoid (logistic) function
+sigmoid <- function(z) 1 / (1 + exp(-z))
+# Input data
+x <- c(1, 2, 3, 4, 5)
+y <- c(0, 0, 0, 1, 1)
+# Initialize parameters and learning rate
+a <- 0   # Intercept
+b <- 0   # Coefficient
+lr <- 0.1  # Learning rate
+# Gradient Descent loop
+for(i in 1:1000) {
+  y_pred <- sigmoid(a + b * x)
+  a <- a + lr * sum(y - y_pred)
+  b <- b + lr * sum((y - y_pred) * x)
+}
+# Output results
+cat("Logistic Regression: logit(y) =", round(a,2), "+", round(b,2), "* x\n")
+cat("Predicted probabilities:", round(sigmoid(a + b * x), 2), "\n")
+# Plot data and fitted curve
+plot(x, y, pch = 19, col = "blue",
+     main = "Logistic Regression",
+     xlab = "X", ylab = "Probability")
+curve(sigmoid(a + b * x), add = TRUE, col = "red", lwd = 2)
+

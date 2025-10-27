@@ -1,0 +1,50 @@
+# Flajolet-Martin Algorithm in Python
+
+def trailing_zeros(x):
+    """Count trailing zeros in binary representation of x."""
+    if x == 0:
+        return 0
+    count = 0
+    while x % 2 == 0:
+        count += 1
+        x //= 2
+    return count
+
+def hash_function(a, b, c, x):
+    """Hash function: (a * x + b) % c"""
+    return (a * x + b) % c
+
+def flajolet_martin(data, a, b, c):
+    """Flajolet-Martin algorithm."""
+    max_trailing = 0
+
+    print(f"\n{'x':<5}{'h(x)':<8}{'Binary':<10}{'r(a)':<6}")
+    print("-" * 35)
+
+    for elem in data:
+        h_val = hash_function(a, b, c, elem)
+        bin_repr = format(h_val, '03b')  # binary with 3 bits
+        tz = trailing_zeros(h_val)
+        max_trailing = max(max_trailing, tz)
+        print(f"{elem:<5}{h_val:<8}{bin_repr:<10}{tz:<6}")
+
+    estimate = 2 ** max_trailing
+    print(f"\nR = {max_trailing}")
+    print(f"Estimated number of distinct elements = 2^{max_trailing} = {estimate}")
+    return estimate
+
+def main():
+    # Take dataset input
+    input_str = input("Enter dataset elements separated by commas: ")
+    data = list(map(int, input_str.strip().split(',')))
+
+    # Take hash function parameters
+    print("\nEnter hash function parameters for h(x) = (a * x + b) % c")
+    a = int(input("Enter a: "))
+    b = int(input("Enter b: "))
+    c = int(input("Enter c: "))
+
+    flajolet_martin(data, a, b, c)
+
+if __name__ == "__main__":
+    main()
