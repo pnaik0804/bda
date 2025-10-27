@@ -45,3 +45,7 @@ public class wordcount {
         }
     }
 }
+
+
+javac wordcount.java
+java wordcount input.txt
